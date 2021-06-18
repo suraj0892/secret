@@ -5,9 +5,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.aws.secretsmanager.AwsSecretsManagerProperties;
+import org.springframework.cloud.aws.secretsmanager.AwsSecretsManagerPropertySourceLocator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.secretsmanager.AWSSecretsManager;
 import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
 
@@ -16,11 +18,17 @@ import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
 @ConditionalOnClass({ AWSSecretsManager.class })
 @ConditionalOnProperty(prefix = AwsSecretsManagerProperties.CONFIG_PREFIX, name = "enabled", matchIfMissing = true)
 public class AwsSecretsManagerBootstrapConfiguration {
-	public static final String REGION = "us-east-1";
+	public static final String REGION = "us-east-2";
 
-	@Bean
+	@Bean(name="smClient")
 	@ConditionalOnMissingBean
 	AWSSecretsManager smClient() {
-		return AWSSecretsManagerClientBuilder.standard().withRegion(REGION).build(); 
+		AWSSecretsManagerClientBuilder  aws = AWSSecretsManagerClientBuilder.standard();
+		aws.setRegion(REGION);
+		AWSSecretsManager awssecret =  aws.withRegion(Regions.US_EAST_2).build(); 
+		return awssecret;
 	}
+	
+	
+
 }
